@@ -26,10 +26,11 @@ env:
     spring.version:5.3.24;
     spring-boot.version:2.7.6;
     '
-  DUBBO_REF: '3.3'
+  DUBBO_OWNER: 'oxsean'
 
 jobs:
   build-samples:
+    needs: [build-dubbo]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -42,6 +43,11 @@ jobs:
           key: ${{ runner.os }}-samples-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-samples-maven-
+      - name: Dubbo cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository/org/apache/dubbo
+          key: ${{ runner.os }}-dubbo-snapshot-${{needs.build-dubbo.outputs.commit_id}}
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
@@ -55,6 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        dubbo: ['3.2', '3.3', 'dev']
     # Map a step output to a job output
     outputs:
       commit_id: ${{ steps.git-checker.outputs.commit_id }}
@@ -62,8 +70,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: 'apache/dubbo'
-          ref: ${{env.DUBBO_REF}}
+          repository: '${{env.DUBBO_OWNER}}/dubbo'
+          ref: '${{matrix.dubbo}}'
       - name: Get commit id and dubbo version
         id: git-checker
         run: |
@@ -87,9 +95,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-dubbo-${{env.DUBBO_REF}}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-dubbo-${{matrix.dubbo}}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-dubbo-${{env.DUBBO_REF}}-maven-
+            ${{ runner.os }}-dubbo-${{matrix.dubbo}}-maven-
       - name: Set up JDK 17
         if: steps.dubbocache.outputs.cache-hit != 'true'
         uses: actions/setup-java@v3
@@ -119,7 +127,7 @@ jobs:
 
   testjob:
     needs: [prepare_test, build-dubbo]
-    name: 'Integration Test (Java${{matrix.java}}, Job${{matrix.job_id}})'
+    name: 'Integration Test (Dubbo${{matrix.dubbo}}, Java${{matrix.java}}, Job${{matrix.job_id}})'
     runs-on: ubuntu-latest
     env:
       JAVA_VER: ${{matrix.java}}
@@ -128,9 +136,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        dubbo: ['3.2', '3.3', 'dev']
         java: [8, 11, 17, 21]
         #testjob id list MUST match 'JOB_COUNT' of 'prepare_test'
-        job_id: [1,2,3,4,5]
+        job_id: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK ${{matrix.java}}
@@ -174,7 +183,7 @@ jobs:
 
   test_result:
     needs: [testjob]
-    name: 'Test Result (Java${{matrix.java}})'
+    name: 'Test Result (Dubbo${{matrix.dubbo}}, Java${{matrix.java}})'
     if: always()
     runs-on: ubuntu-latest
     strategy:
