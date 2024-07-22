@@ -2,7 +2,6 @@ package org.apache.dubbo.rest.demo.routine;
 
 import org.apache.dubbo.rest.demo.pojo.Bean;
 
-import javax.annotation.Nonnull;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -15,42 +14,48 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Form;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
+@Path("/")
 public interface ErrorTestCase {
 
     @GET
-    @Path("/matrix/stringMap;{m}")
+    @Path("/param/matrix/stringMap;m={map}")
     Map<String,String> sayMatrixStringMap(@MatrixParam("map")Map<String,String> value);
 
     @GET
-    @Path("/header/list")
+    @Path("/param/header/list")
     List<String> sayHeader(@HeaderParam("name") List<String> values);
 
     @GET
-    @Path("/consumeJson")
+    @Path("/mapping/consumeJson")
     @Consumes("*/json")
     @Produces("text/plain")
     String testConsumesJson(@QueryParam("name") String name);
 
     @GET
-    @Path("/producesJson")
+    @Path("/mapping/producesJson")
     @Produces("*/json")
     String testProducesJson(@QueryParam("name") String name);
 
     @GET
-    @Path("/default")
-    String testDefault(@Nonnull @QueryParam("name") @DefaultValue("world")  String name);
+    @Path("/complex/default")
+    String testDefault( @QueryParam("name") @DefaultValue("world")  String name);
 
 
     @GET
-    @Path("/beanForm")
+    @Path("/complex/beanForm")
     OptionalInt testBeanForm(@BeanParam Bean bean);
 
     @POST
-    @Path("/form")
+    @Path("/complex/form")
     String testForm(@Context Form form);
+
+    @POST
+    @Path("/param/input")
+    String testInPut(InputStream inputStream);
 
 }

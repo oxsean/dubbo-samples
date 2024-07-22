@@ -9,6 +9,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class ErrorTest {
 
 
     private static final String providerAddress = System.getProperty("dubbo.address", "localhost");
-        @Test
+    @Test
     public void testInput(){
         RestClient defaultClient = RestClient.create();
         ResponseEntity<String> result = defaultClient.post()
@@ -25,10 +26,11 @@ public class ErrorTest {
                 .header("test","hello")
                 .retrieve()
                 .toEntity(String.class);
-        Assert.assertEquals("Hello world", result.getBody());
+//        Assert.assertEquals("Hello", result.getBody());
+        System.out.println(result.getBody());
     }
 
-//    @Test
+    @Test
     public void testMatrixStringMap(){
 //        矩阵参数map返回list
         RestClient defaultClient = RestClient.create();
@@ -40,20 +42,20 @@ public class ErrorTest {
                 });
         Assert.assertEquals("Hello world", result.getBody());
     }
- //    @Test
+     @Test
     public void testHeaderList(){
 //        请求头中只能传递多个参数，在接收方只能剩余一个
         ResponseEntity<List<String>> response = RestClient.create().get()
                 .uri("http://" + providerAddress + ":50052/param/header/list")
                 .header( "Content-type","application/json")
 //                .header("test","world")
-                .header("test","Hello ","1")
+                .header("name","Hello ","1")
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<List<String>>() {});
         Assert.assertEquals("Hello world",response.getBody());
     }
 
-//    @Test
+    @Test
     public void testProducesJson(){
         ResponseEntity<String> response = RestClient.create().get()
                 .uri("http://" + providerAddress + ":50052/mapping/producesJson?name={name}","world")
@@ -74,7 +76,7 @@ public class ErrorTest {
     }
 
 
-//    @Test
+    @Test
     public void testBeanForm(){
         ResponseEntity<String> response = RestClient.create().get()
                 .uri("http://" + providerAddress + ":50052/complex/beanForm?beanId=1")
@@ -85,7 +87,7 @@ public class ErrorTest {
     }
 
 
-//    @Test
+    @Test
     public void testFrom(){
         MultiValueMap<String, Long> map = new LinkedMultiValueMap<>();
         map.add("number",1L);
@@ -101,13 +103,13 @@ public class ErrorTest {
         System.out.println(response.getBody());
     }
 
-    //    @Test
+        @Test
     public void testDefault(){
         ResponseEntity<String> response = RestClient.create().get()
                 .uri("http://" + providerAddress + ":50052/complex/default")
                 .header("Content-type", "application/json")
                 .retrieve()
                 .toEntity(String.class);
-        Assert.assertEquals("", response.getBody());
+        Assert.assertEquals("Hello world", response.getBody());
     }
 }

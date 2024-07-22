@@ -1,13 +1,18 @@
 package org.apache.dubbo.rest.demo.routine;
 
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.rest.demo.pojo.Bean;
 
-import javax.annotation.Nonnull;
 import javax.ws.rs.core.Form;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
+@DubboService
 public class ErrorTestCaseImpl implements ErrorTestCase {
 
     @Override
@@ -32,7 +37,7 @@ public class ErrorTestCaseImpl implements ErrorTestCase {
     }
 
     @Override
-    public String testDefault(@Nonnull String name) {
+    public String testDefault(String name) {
         return "Hello "+name;
     }
 
@@ -47,5 +52,24 @@ public class ErrorTestCaseImpl implements ErrorTestCase {
         return form.asMap().get("number").get(0);
     }
 
+    @Override
+    public String testInPut(InputStream inputStream) {
+        String content = "";
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) != -1) {
+                os.write(buffer, 0, length);
+            }
+
+             content = os.toString(StandardCharsets.UTF_8);
+
+            System.out.println(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return content;
+    }
 
 }
