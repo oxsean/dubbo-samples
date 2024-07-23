@@ -1,44 +1,40 @@
 package org.apache.dubbo.rest.demo.routine;
 
+import org.apache.dubbo.common.io.StreamUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.rest.demo.pojo.Bean;
 
 import javax.ws.rs.core.Form;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 import java.util.OptionalInt;
 
 @DubboService
 public class ErrorTestCaseImpl implements ErrorTestCase {
 
     @Override
-    public Map<String, String> sayMatrixStringMap(Map<String, String> value) {
-        return value;
+    public String sayMatrixStringMap(String key, String name) {
+        return name;
     }
 
-
     @Override
-    public List<String> sayHeader(List<String> values) {
-        return values;
+    public String sayHeader(String name, String test) {
+        return name + ' ' + test;
     }
 
     @Override
     public String testConsumesJson(String name) {
-        return "Hello "+name;
+        return "Hello " + name;
     }
 
     @Override
     public String testProducesJson(String name) {
-        return "Hello "+name;
+        return "Hello " + name;
     }
 
     @Override
     public String testDefault(String name) {
-        return "Hello "+name;
+        return "Hello " + name;
     }
 
     @Override
@@ -48,28 +44,15 @@ public class ErrorTestCaseImpl implements ErrorTestCase {
 
     @Override
     public String testForm(Form form) {
-        System.out.println(form.asMap());
         return form.asMap().get("number").get(0);
     }
 
     @Override
     public String testInPut(InputStream inputStream) {
-        String content = "";
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = inputStream.read(buffer)) != -1) {
-                os.write(buffer, 0, length);
-            }
-
-             content = os.toString(StandardCharsets.UTF_8);
-
-            System.out.println(content);
+        try {
+            return StreamUtils.toString(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return content;
     }
-
 }

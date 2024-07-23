@@ -10,35 +10,34 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Form;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 import java.util.OptionalInt;
 
 @Path("/")
 public interface ErrorTestCase {
 
     @GET
-    @Path("/param/matrix/stringMap;m={map}")
-    Map<String,String> sayMatrixStringMap(@MatrixParam("map")Map<String,String> value);
+    @Path("/param/matrix/{key}")
+    String sayMatrixStringMap(@PathParam("key") String key, @MatrixParam("name") String value);
 
     @GET
     @Path("/param/header/list")
-    List<String> sayHeader(@HeaderParam("name") List<String> values);
+    String sayHeader(@HeaderParam("name") String name, @HeaderParam("test") String test);
 
-    @GET
+    @POST
     @Path("/mapping/consumeJson")
-    @Consumes("*/json")
+    @Consumes("application/json")
     @Produces("text/plain")
-    String testConsumesJson(@QueryParam("name") String name);
+    String testConsumesJson(String name);
 
     @GET
     @Path("/mapping/producesJson")
-    @Produces("*/json")
+    @Produces("application/json")
     String testProducesJson(@QueryParam("name") String name);
 
     @GET

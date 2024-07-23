@@ -24,8 +24,4 @@ public class Bean implements Serializable {
 
     @QueryParam("id")
     public OptionalInt beanId;
-
-    public Bean(OptionalInt beanId) {
-        this.beanId = beanId;
-    }
 }
