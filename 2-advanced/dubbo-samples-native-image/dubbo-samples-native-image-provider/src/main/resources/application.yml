@@ -23,12 +23,16 @@ dubbo:
     name: tri
     port: 50052
     serialization: fastjson2
+    triple:
+      http3:
+        enabled: true
   provider:
-    serialization: fastjson2
-  consumer:
     serialization: fastjson2
 
 logging:
+  level:
+    "org.apache.dubbo.rpc.protocol.tri": DEBUG
+    "org.apache.dubbo.remoting.http12": DEBUG
   pattern:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
 

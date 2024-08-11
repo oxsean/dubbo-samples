@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 spring:
   application:
     name: dubbo-samples-nativeimage-consumer
@@ -21,8 +20,14 @@ dubbo:
     name: ${spring.application.name}
     logger: slf4j
     qos-port: 22223
+  protocol:
+    triple:
+      http3:
+        enabled: true
 
 logging:
+  level:
+    "org.apache.dubbo.rpc.protocol.tri": DEBUG
   pattern:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
 
