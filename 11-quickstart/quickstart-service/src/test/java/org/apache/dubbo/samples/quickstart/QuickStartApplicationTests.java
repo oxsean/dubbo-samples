@@ -16,14 +16,35 @@
  */
 package org.apache.dubbo.samples.quickstart;
 
+import org.apache.dubbo.config.annotation.DubboReference;
+
+import org.apache.dubbo.samples.quickstart.dubbo.api.DemoService;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class QuickStartApplicationTests {
 
+    @DubboReference(scope = "remote")
+    private DemoService demoService;
+
     @Test
     void contextLoads() {
+        for (int i = 0; i < 100; i++) {
+            int finalI = i;
+            executeJob(() -> {
+                String result = demoService.sayHello("world" + finalI);
+                System.out.println("Receive result ======> " + result);
+            });
+        }
     }
 
+    public static void executeJob(Runnable handle) {
+        executeJob(handle, null);
+    }
+
+    public static void executeJob(Runnable handle, Runnable exceptionHandler) {
+        handle.run(); // excute job
+    }
 }
